@@ -1,4 +1,4 @@
-%w(rubygems bundler open-uri sqlite3).each { |resource| require resource }
+%w(rubygems bundler open-uri).each { |resource| require resource }
 Bundler.require
 
 def puts msg
