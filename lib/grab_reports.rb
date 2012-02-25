@@ -21,7 +21,13 @@ DB.execute("CREATE TABLE IF NOT EXISTS `surf_reports` (
 
 # santa cruz: http://www.surfline.com/surf-forecasts/central-california/santa-cruz_2958
 surf_spots = {
-  "Capitola" => "http://www.surfline.com/surf-report/capitola-central-california_10763"
+  "Capitola" => "http://www.surfline.com/surf-report/capitola-central-california_10763",
+  "Pleasure Point" => "http://www.surfline.com/surf-report/pleasure-point-central-california_4190",
+  "38th Ave" => "http://www.surfline.com/surf-report/38th-ave-central-california_4191",
+  "Steamer Lane" => "http://www.surfline.com/surf-report/steamer-lane-central-california_4188" ,
+  "Cowells" => "http://www.surfline.com/surf-report/cowells-central-california_4189",
+  "Ocean Beach (SF)" => "http://www.surfline.com/surf-report/ocean-beach-central-california_4127",
+  "S. Ocean Beach (SF)" => "http://www.surfline.com/surf-report/south-ocean-beach-central-california_4128"
 }
 
 surf_spots.each do |spot,url|

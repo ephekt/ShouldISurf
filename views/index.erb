@@ -1,7 +1,8 @@
 <div id="container" style="margin:auto; text-align: center;">
   <span style="font-size:35px;color:green;font-weight:bold">YES!</span>
-  <div id="last_report">
-    <h1><%= @spot %> @ <%= @height %></h1>
-    <p style="font-size:12px">updated within the last hour</p>
-  </div>
+  <% @latest_reports.each do |report| %>
+    <div class="last_report">
+      <h1><%= report[0] %> @ <%= report[1] %></h1>
+    </div>
+  <% end %>
 </div>
