@@ -31,7 +31,6 @@ surf_spots = {
 }
 
 surf_spots.each do |spot,url|
-  height = "Not Available or too low to quantify"
   begin
     page = grab_page(url)
     if page.include? "text-surfheight"
@@ -45,7 +44,9 @@ surf_spots.each do |spot,url|
     puts "Tried to parse & grab report for #{spot} but failed -- #{e}"
     next
   end
-    
+  
+  next unless height
+  
   q = "insert into `surf_reports` (location,height) VALUES ('#{spot}','#{height}');"
   puts q
   begin
