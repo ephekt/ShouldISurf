@@ -1,14 +1,13 @@
+## GrabReports -- Surfline Parser
 %w(rubygems bundler open-uri).each { |resource| require resource }
 Bundler.require
 
-def puts msg
-  super("#{Time.now.strftime('%Y-%m-%d %l %p')} :: #{msg}")
-end
+## SAVE FOR LATER
+# santa cruz: http://www.surfline.com/surf-forecasts/central-california/santa-cruz_2958
+# http://www.surfshot.com/
+# http://forecasts.swellwatch.com/#place=36.910372213522535_-122.02446000000002_11_1534_height_SurfSpot_Sat_-1
 
-def grab_page url
-  raise unless url
-  Typhoeus::Request.get(url).body
-end
+##  DATABASE SETUP
 
 puts "Loaded report grabber"
 
@@ -19,33 +18,53 @@ DB.execute("CREATE TABLE IF NOT EXISTS `surf_reports` (
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )")
 
-# santa cruz: http://www.surfline.com/surf-forecasts/central-california/santa-cruz_2958
+## SOME HELPER METHODS
+
+def puts msg
+  super("#{Time.now.strftime('%Y-%m-%d %l %p')} :: #{msg}")
+end
+
+def grab_page url
+  raise unless url
+  Typhoeus::Request.get(url).body
+end
+
+def inner_text nokogiri_search
+  val = nokogiri_search.first.inner_text rescue nil
+  if val.empty?
+    nil
+  else
+    val.gsub("'","''")
+  end
+end
+
+## SURF SPOTS
+
 surf_spots = {
-  "Capitola" => "http://www.surfline.com/surf-report/capitola-central-california_10763",
-  "Pleasure Point" => "http://www.surfline.com/surf-report/pleasure-point-central-california_4190",
-  "38th Ave" => "http://www.surfline.com/surf-report/38th-ave-central-california_4191",
-  "Steamer Lane" => "http://www.surfline.com/surf-report/steamer-lane-central-california_4188" ,
-  "Cowells" => "http://www.surfline.com/surf-report/cowells-central-california_4189",
-  "Ocean Beach (SF)" => "http://www.surfline.com/surf-report/ocean-beach-central-california_4127",
-  "S. Ocean Beach (SF)" => "http://www.surfline.com/surf-report/south-ocean-beach-central-california_4128"
+  "Capitola" => "10763",
+  "Pleasure Point" => "4190",
+  "38th Ave" => "4191",
+  "Steamer Lane" => "4188" ,
+  "Cowells" => "4189",
+  "Ocean Beach (SF)" => "4127",
+  "S. Ocean Beach (SF)" => "4128"
 }
 
-surf_spots.each do |spot,url|
+## FETCHER
+
+surf_spots.each do |spot,spot_id|
   begin
-    page = grab_page(url)
-    if page.include? "text-surfheight"
-      elem = Nokogiri::HTML(page).search("//p[@id = 'text-surfheight']").first
-      height = elem.inner_text.gsub("'","''")
-      puts "Found height: #{height}, writing to DB"
-    else
-      puts "No height found in report page"
-    end
+    url = "http://www.surfline.com/widgets2/widget_camera_mods.cfm?id=#{spot_id}&mdl=0111&ftr=&units=e&lan=en"
+    n = Nokogiri::HTML(grab_page(url))
+
+    height = inner_text(n.xpath("//span[@style='font-size:21px;font-weight:bold']")) ||
+              inner_text(n.xpath("//div[@style='font-size:12px;padding-left:10px;margin-bottom:7px;']")) ||
+              "Report Not Available"
+
   rescue Exception => e
     puts "Tried to parse & grab report for #{spot} but failed -- #{e}"
     next
   end
-  
-  next unless height
   
   q = "insert into `surf_reports` (location,height) VALUES ('#{spot}','#{height}');"
   puts q
