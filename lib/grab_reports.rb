@@ -29,9 +29,9 @@ surf_spots.each do |spot,url|
   begin
     page = grab_page(url)
     if page.include? "text-surfheight"
-      puts "Has height"
       elem = Nokogiri::HTML(page).search("//p[@id = 'text-surfheight']").first
       height = elem.inner_text.gsub("'","''")
+      puts "Found height: #{height}, writing to DB"
     else
       puts "No height found in report page"
     end
@@ -40,7 +40,6 @@ surf_spots.each do |spot,url|
     next
   end
     
-  puts "Found height: #{height}, writing to DB"
   q = "insert into `surf_reports` (location,height) VALUES ('#{spot}','#{height}');"
   puts q
   begin
