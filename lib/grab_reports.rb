@@ -7,7 +7,7 @@ end
 
 def grab_page url
   raise unless url
-  Nokogiri::HTML(open(url))
+  Typhoeus::Request.get(url).body
 end
 
 puts "Loaded report grabber"
@@ -25,15 +25,18 @@ surf_spots = {
 }
 
 surf_spots.each do |spot,url|
+  height = "Not Available or too low to quantify"
   begin
-    elem = grab_page(url).search("//p[@id = 'text-surfheight']").first.inner_text
-    height = if elem.empty?
-      "Not Available or too low to quantify"
+    page = grab_page(url)
+    if page.include? "text-surfheight"
+      puts "Has height"
+      elem = Nokogiri::HTML(page).search("//p[@id = 'text-surfheight']").first
+      height = elem.inner_text.gsub("'","''")
     else
-      elem.gsub("'","''")
+      puts "No height found in report page"
     end
   rescue Exception => e
-    puts "Tried to parse & grab report for #{sport} but failed -- #{e}"
+    puts "Tried to parse & grab report for #{spot} but failed -- #{e}"
     next
   end
     
