@@ -1,5 +1,4 @@
 class Surf < Sinatra::Base
-  DB = SQLite3::Database.new( "surf_reports.db" )
   set :erb, :format => :html5
   
   get "/" do
@@ -9,7 +8,7 @@ class Surf < Sinatra::Base
       GROUP BY location
       ORDER BY created_at DESC
     "
-    @latest_reports = DB.execute q
+    @latest_reports = SQLite3::Database.new( "surf_reports.db" ).execute q
     erb :index
   end
 end
