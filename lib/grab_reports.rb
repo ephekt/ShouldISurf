@@ -26,7 +26,7 @@ surf_spots = {
 
 surf_spots.each do |spot,url|
   begin
-    elem = grab_page(url).xpath("id('text-surfheight')").inner_text
+    elem = grab_page(url).search("//p[@id = 'text-surfheight']").first.inner_text
     height = if elem.empty?
       "Not Available or too low to quantify"
     else
