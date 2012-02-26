@@ -5,12 +5,14 @@ require 'time'
 
 Bundler.require
 
-require "sinatra/reloader" if ENV['MODE'] == "dev"
-
-FileUtils.mkdir_p 'log' unless File.exists?('log')
-log = File.new("log/sinatra.log", "a")
-$stdout.reopen(log)
-$stderr.reopen(log)
+if ENV['MODE'] == "dev"
+  require "sinatra/reloader"
+else
+  FileUtils.mkdir_p 'log' unless File.exists?('log')
+  log = File.new("log/sinatra.log", "a")
+  $stdout.reopen(log)
+  $stderr.reopen(log)
+end
 
 require './surf'
 run Surf

@@ -12,9 +12,11 @@ Bundler.require
 puts "Loaded report grabber"
 
 DB = SQLite3::Database.new( "surf_reports.db" )
+
 DB.execute("CREATE TABLE IF NOT EXISTS `surf_reports` (
-    `location` varchar(32) NOT NULL,
+    `location` varchar(128) NOT NULL,
     `height` varchar(256) NOT NULL,
+    `tide` varchar(256) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )")
 
@@ -60,13 +62,15 @@ surf_spots.each do |spot,spot_id|
     height = inner_text(n.xpath("//span[@style='font-size:21px;font-weight:bold']")) ||
               inner_text(n.xpath("//div[@style='font-size:12px;padding-left:10px;margin-bottom:7px;']")) ||
               "Report Not Available"
-
+              
+    tides = n.xpath("//div//small[contains(text(),'TIDES')]").first.parent
+    tide = tides.text.gsub("\u00A0\u00A0\u00A0"," ").scan(/\d(.*?)\n/).join(",")
   rescue Exception => e
     puts "Tried to parse & grab report for #{spot} but failed -- #{e}"
     next
   end
   
-  q = "insert into `surf_reports` (location,height) VALUES ('#{spot}','#{height}');"
+  q = "insert into `surf_reports` (location,height,tide) VALUES ('#{spot}','#{height}','#{tide}');"
   puts q
   begin
     DB.execute q

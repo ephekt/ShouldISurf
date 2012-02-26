@@ -1,8 +1,11 @@
 <div id="container" style="margin:auto; text-align: center; text-shadow: 2px 2px 2px #FFF;">
   <span style="font-size:35px;color:green;font-weight:bold">YES!</span>
-  <% @latest_reports.each do |report| %>
+  <% @latest_reports.each_with_index do |report, index| %>
     <div class="last_report">
-      <h1><%= report[0] %> @ <%= report[1] %></h1>
+      <h1 class='linkable' id="report_<%= index %>"><%= report[0] %> @ <%= report[1] %></h1>
+      <div class='report_data' style="display:none" id="report_<%= index %>_data">
+        <%= report[2].split(",").join("<br />") %>
+      </div>
     </div>
   <% end %>
 </div>
