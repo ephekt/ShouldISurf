@@ -32,7 +32,7 @@ def grab_page url
 end
 
 def inner_text nokogiri_search
-  val = nokogiri_search.first.inner_text rescue nil
+  val = nokogiri_search.first.inner_text rescue ''
   if val.empty?
     nil
   else
