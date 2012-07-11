@@ -31,8 +31,9 @@ def grab_page url
   Typhoeus::Request.get(url).body
 end
 
-def inner_text nokogiri_search
-  val = nokogiri_search.first.inner_text rescue ''
+def text noko, matcher
+  val = noko.xpath(matcher).first.inner_text rescue ''
+  
   if val.empty?
     nil
   else
@@ -59,10 +60,10 @@ surf_spots.each do |spot,spot_id|
     url = "http://www.surfline.com/widgets2/widget_camera_mods.cfm?id=#{spot_id}&mdl=0111&ftr=&units=e&lan=en"
     n = Nokogiri::HTML(grab_page(url))
 
-    height = inner_text(n.xpath("//span[@style='font-size:21px;font-weight:bold']")) ||
-              inner_text(n.xpath("//div[@style='font-size:12px;padding-left:10px;margin-bottom:7px;']")) ||
-              "Report Not Available"
-              
+    height = text(n,"//span[@style='font-size:21px;font-weight:bold']") ||
+          text(n,"//div[@style='font-size:12px;padding-left:10px;margin-bottom:7px;']") ||
+          "Report Not Available"
+    
     tides = n.xpath("//div//small[contains(text(),'TIDES')]").first.parent
     tide = tides.text.gsub("\u00A0\u00A0\u00A0"," ").scan(/\d(.*?)\n/).join(",")
   rescue Exception => e
